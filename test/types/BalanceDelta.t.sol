@@ -60,12 +60,19 @@ contract TestBalanceDelta is Test {
     }
 
     function test_add_revertsOnOverflow() public {
+        // Use try/catch for HH3 compatibility
         // should revert because type(int128).max + 1 is not possible
-        vm.expectRevert();
-        toBalanceDelta(type(int128).max, 0) + toBalanceDelta(1, 0);
+        try this.addBalanceDeltas(toBalanceDelta(type(int128).max, 0), toBalanceDelta(1, 0)) {
+            fail();
+        } catch {}
 
-        vm.expectRevert();
-        toBalanceDelta(0, type(int128).max) + toBalanceDelta(0, 1);
+        try this.addBalanceDeltas(toBalanceDelta(0, type(int128).max), toBalanceDelta(0, 1)) {
+            fail();
+        } catch {}
+    }
+
+    function addBalanceDeltas(BalanceDelta a, BalanceDelta b) external pure returns (BalanceDelta) {
+        return a + b;
     }
 
     function test_fuzz_add(int128 a, int128 b, int128 c, int128 d) public {
@@ -74,12 +81,14 @@ contract TestBalanceDelta is Test {
 
         // if the addition overflows it should revert
         if (ac != int128(ac) || bd != int128(bd)) {
-            vm.expectRevert();
+            try this.addBalanceDeltas(toBalanceDelta(a, b), toBalanceDelta(c, d)) {
+                fail();
+            } catch {}
+        } else {
+            BalanceDelta balanceDelta = toBalanceDelta(a, b) + toBalanceDelta(c, d);
+            assertEq(balanceDelta.amount0(), ac);
+            assertEq(balanceDelta.amount1(), bd);
         }
-
-        BalanceDelta balanceDelta = toBalanceDelta(a, b) + toBalanceDelta(c, d);
-        assertEq(balanceDelta.amount0(), ac);
-        assertEq(balanceDelta.amount1(), bd);
     }
 
     function test_sub() public pure {
@@ -103,12 +112,19 @@ contract TestBalanceDelta is Test {
     }
 
     function test_sub_revertsOnUnderflow() public {
+        // Use try/catch for HH3 compatibility
         // should revert because type(int128).min - 1 is not possible
-        vm.expectRevert();
-        toBalanceDelta(type(int128).min, 0) - toBalanceDelta(1, 0);
+        try this.subBalanceDeltas(toBalanceDelta(type(int128).min, 0), toBalanceDelta(1, 0)) {
+            fail();
+        } catch {}
 
-        vm.expectRevert();
-        toBalanceDelta(0, type(int128).min) - toBalanceDelta(0, 1);
+        try this.subBalanceDeltas(toBalanceDelta(0, type(int128).min), toBalanceDelta(0, 1)) {
+            fail();
+        } catch {}
+    }
+
+    function subBalanceDeltas(BalanceDelta a, BalanceDelta b) external pure returns (BalanceDelta) {
+        return a - b;
     }
 
     function test_fuzz_sub(int128 a, int128 b, int128 c, int128 d) public {
@@ -117,12 +133,14 @@ contract TestBalanceDelta is Test {
 
         // if the subtraction underflows it should revert
         if (ac != int128(ac) || bd != int128(bd)) {
-            vm.expectRevert();
+            try this.subBalanceDeltas(toBalanceDelta(a, b), toBalanceDelta(c, d)) {
+                fail();
+            } catch {}
+        } else {
+            BalanceDelta balanceDelta = toBalanceDelta(a, b) - toBalanceDelta(c, d);
+            assertEq(balanceDelta.amount0(), ac);
+            assertEq(balanceDelta.amount1(), bd);
         }
-
-        BalanceDelta balanceDelta = toBalanceDelta(a, b) - toBalanceDelta(c, d);
-        assertEq(balanceDelta.amount0(), ac);
-        assertEq(balanceDelta.amount1(), bd);
     }
 
     function test_fuzz_eq(int128 a, int128 b, int128 c, int128 d) public pure {

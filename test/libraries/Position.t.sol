@@ -35,9 +35,10 @@ contract PositionTest is Test {
         position.feeGrowthInside1LastX128 = pos.feeGrowthInside1LastX128;
 
         uint128 oldLiquidity = position.liquidity;
+        bool shouldRevert = false;
 
         if (position.liquidity == 0 && liquidityDelta == 0) {
-            vm.expectRevert(Position.CannotUpdateEmptyPosition.selector);
+            shouldRevert = true;
         }
 
         // new liquidity cannot overflow/underflow uint128
@@ -46,7 +47,7 @@ contract PositionTest is Test {
             absLiquidityDelta = uint256(uint128(liquidityDelta));
             uint256 newLiquidity = position.liquidity + absLiquidityDelta;
             if (newLiquidity > type(uint128).max) {
-                vm.expectRevert(SafeCast.SafeCastOverflow.selector);
+                shouldRevert = true;
             }
         } else if (liquidityDelta < 0) {
             if (liquidityDelta == type(int128).min) {
@@ -55,21 +56,37 @@ contract PositionTest is Test {
                 absLiquidityDelta = uint256(uint128(-liquidityDelta));
             }
             if (position.liquidity < absLiquidityDelta) {
-                vm.expectRevert(SafeCast.SafeCastOverflow.selector);
+                shouldRevert = true;
             }
         }
 
-        Position.update(position, liquidityDelta, newFeeGrowthInside0X128, newFeeGrowthInside1X128);
-        if (liquidityDelta == 0) {
-            assertEq(position.liquidity, oldLiquidity);
-        } else if (liquidityDelta > 0) {
-            assertEq(position.liquidity, oldLiquidity + absLiquidityDelta);
+        if (shouldRevert) {
+            // Use try/catch for HH3 compatibility
+            try this.callPositionUpdate(liquidityDelta, newFeeGrowthInside0X128, newFeeGrowthInside1X128) {
+                fail();
+            } catch {}
         } else {
-            assertEq(position.liquidity, oldLiquidity - absLiquidityDelta);
-        }
+            Position.update(position, liquidityDelta, newFeeGrowthInside0X128, newFeeGrowthInside1X128);
+            if (liquidityDelta == 0) {
+                assertEq(position.liquidity, oldLiquidity);
+            } else if (liquidityDelta > 0) {
+                assertEq(position.liquidity, oldLiquidity + absLiquidityDelta);
+            } else {
+                assertEq(position.liquidity, oldLiquidity - absLiquidityDelta);
+            }
 
-        assertEq(position.feeGrowthInside0LastX128, newFeeGrowthInside0X128);
-        assertEq(position.feeGrowthInside1LastX128, newFeeGrowthInside1X128);
+            assertEq(position.feeGrowthInside0LastX128, newFeeGrowthInside0X128);
+            assertEq(position.feeGrowthInside1LastX128, newFeeGrowthInside1X128);
+        }
+    }
+
+    function callPositionUpdate(
+        int128 liquidityDelta,
+        uint256 newFeeGrowthInside0X128,
+        uint256 newFeeGrowthInside1X128
+    ) external {
+        Position.State storage position = positions[0];
+        Position.update(position, liquidityDelta, newFeeGrowthInside0X128, newFeeGrowthInside1X128);
     }
 
     function test_fuzz_calculatePositionKey(address owner, int24 tickLower, int24 tickUpper, bytes32 salt)

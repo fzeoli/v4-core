@@ -325,8 +325,21 @@ contract TickTest is Test {
     function testTick_update_revertsOnOverflowLiquidityGross() public {
         update(0, 0, int128(Constants.MAX_UINT128 / 2 - 1), 0, 0, false);
 
-        vm.expectRevert();
-        update(0, 0, int128(Constants.MAX_UINT128 / 2 - 1), 0, 0, false);
+        // Use try/catch for HH3 compatibility
+        try this.callUpdate(0, 0, int128(Constants.MAX_UINT128 / 2 - 1), 0, 0, false) {
+            fail();
+        } catch {}
+    }
+
+    function callUpdate(
+        int24 tick,
+        int24 tickCurrent,
+        int128 liquidityDelta,
+        uint256 feeGrowthGlobal0X128,
+        uint256 feeGrowthGlobal1X128,
+        bool upper
+    ) external returns (bool flipped, uint128 liquidityGrossAfter) {
+        return update(tick, tickCurrent, liquidityDelta, feeGrowthGlobal0X128, feeGrowthGlobal1X128, upper);
     }
 
     function testTick_update_assumesAllGrowthHappensBelowTicksLteCurrentTick() public {

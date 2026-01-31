@@ -6,8 +6,14 @@ import {BitMath} from "../../src/libraries/BitMath.sol";
 
 contract TestBitMath is Test {
     function test_mostSignificantBit_revertsWhenZero() public {
-        vm.expectRevert();
-        BitMath.mostSignificantBit(0);
+        // Use try/catch for HH3 compatibility instead of vm.expectRevert()
+        try this.callMostSignificantBit(0) {
+            fail();
+        } catch {}
+    }
+
+    function callMostSignificantBit(uint256 x) external pure returns (uint8) {
+        return BitMath.mostSignificantBit(x);
     }
 
     function test_mostSignificantBit_one() public pure {
@@ -56,8 +62,14 @@ contract TestBitMath is Test {
     }
 
     function test_leastSignificantBit_revertsWhenZero() public {
-        vm.expectRevert();
-        BitMath.leastSignificantBit(0);
+        // Use try/catch for HH3 compatibility instead of vm.expectRevert()
+        try this.callLeastSignificantBit(0) {
+            fail();
+        } catch {}
+    }
+
+    function callLeastSignificantBit(uint256 x) external pure returns (uint8) {
+        return BitMath.leastSignificantBit(x);
     }
 
     function test_leastSignificantBit_one() public pure {
