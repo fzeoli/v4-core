@@ -16,8 +16,21 @@
     "url": "https://uniswap.org/bug-bounty"
   },
   "homepage": "https://github.com/Uniswap/v4-core#readme",
+  "type": "module",
   "publishConfig": {
     "access": "public",
     "provenance": true
+  },
+  "devDependencies": {
+    "hardhat": "^3.0.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test solidity",
+    "test:pr": "HARDHAT_FUZZ_RUNS=10000 hardhat test solidity",
+    "test:ci": "HARDHAT_FUZZ_RUNS=100000 hardhat test solidity",
+    "fmt": "npx prettier --write ."
   }
 }
