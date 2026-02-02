@@ -8,7 +8,24 @@ on:
       - audit/*
 
 jobs:
-  test:
+  test-foundry:
+    name: Foundry Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: bullfrogsec/bullfrog@1831f79cce8ad602eef14d2163873f27081ebfb3 # v0.8.4
+
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: foundry-rs/foundry-toolchain@v1
+
+      - run: forge build
+
+      - run: FOUNDRY_PROFILE=pr forge test --isolate
+
+  test-hardhat:
     name: Hardhat Tests
     runs-on: ubuntu-latest
 
