@@ -418,7 +418,29 @@ Fuzz tests that encounter reverts during fuzzing:
 
 ---
 
-## 12. Conclusion
+## 12. Skipped Tests for Performance Parity
+
+Hardhat 3 does not support `forge-config` inline comments for per-test fuzz run configuration. One test uses FFI (spawns Node.js processes) and relies on this feature to limit fuzz runs:
+
+**Skipped test:** `skip_test_ffi_fuzz_addLiquidity_defaultPool_ReturnsCorrectLiquidityDelta`
+**File:** `test/ModifyLiquidity.t.sol:56`
+
+```solidity
+/// forge-config: default.fuzz.runs = 10
+/// forge-config: ci.fuzz.runs = 500
+function skip_test_ffi_fuzz_addLiquidity_defaultPool_ReturnsCorrectLiquidityDelta(...)
+```
+
+| Runner | Fuzz Runs | Time |
+|--------|-----------|------|
+| Foundry | 10 (respects config) | ~1s |
+| Hardhat | 1000 (ignores config) | ~2m |
+
+The test is skipped to maintain equivalent test execution time between Foundry and Hardhat 3.
+
+---
+
+## 13. Conclusion
 
 Hardhat 3's forge-std compatibility is approximately **91%** for this codebase. The primary blocker is `vm.expectRevert` behavior differences, which affect tests that verify error conditions.
 

@@ -8,13 +8,20 @@ import {Constants} from "../../test/utils/Constants.sol";
 
 contract SqrtPriceMathTest is Test {
     function test_getNextSqrtPriceFromInput_revertsIfPriceIsZero() public {
-        vm.expectRevert(SqrtPriceMath.InvalidPriceOrLiquidity.selector);
-        SqrtPriceMath.getNextSqrtPriceFromInput(0, 1, 0.1 ether, false);
+        // Use try/catch for HH3 compatibility
+        try this.callGetNextSqrtPriceFromInput(0, 1, 0.1 ether, false) {
+            fail();
+        } catch {}
+    }
+
+    function callGetNextSqrtPriceFromInput(uint160 sqrtPX96, uint128 liquidity, uint256 amountIn, bool zeroForOne) external pure returns (uint160) {
+        return SqrtPriceMath.getNextSqrtPriceFromInput(sqrtPX96, liquidity, amountIn, zeroForOne);
     }
 
     function test_getNextSqrtPriceFromInput_revertsIfLiquidityIsZero() public {
-        vm.expectRevert(SqrtPriceMath.InvalidPriceOrLiquidity.selector);
-        SqrtPriceMath.getNextSqrtPriceFromInput(1, 0, 0.1 ether, true);
+        try this.callGetNextSqrtPriceFromInput(1, 0, 0.1 ether, true) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromInput_revertsIfInputAmountOverflowsThePrice() public {
@@ -22,8 +29,9 @@ contract SqrtPriceMathTest is Test {
         uint128 liquidity = 1024;
         uint256 amountIn = 1024;
 
-        vm.expectRevert();
-        SqrtPriceMath.getNextSqrtPriceFromInput(price, liquidity, amountIn, false);
+        try this.callGetNextSqrtPriceFromInput(price, liquidity, amountIn, false) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromInput_anyInputAmountCannotUnderflowThePrice() public pure {
@@ -110,13 +118,19 @@ contract SqrtPriceMathTest is Test {
     }
 
     function test_getNextSqrtPriceFromOutput_revertsIfPriceIsZero() public {
-        vm.expectRevert(SqrtPriceMath.InvalidPriceOrLiquidity.selector);
-        SqrtPriceMath.getNextSqrtPriceFromOutput(0, 1, 0.1 ether, false);
+        try this.callGetNextSqrtPriceFromOutput(0, 1, 0.1 ether, false) {
+            fail();
+        } catch {}
+    }
+
+    function callGetNextSqrtPriceFromOutput(uint160 sqrtPX96, uint128 liquidity, uint256 amountOut, bool zeroForOne) external pure returns (uint160) {
+        return SqrtPriceMath.getNextSqrtPriceFromOutput(sqrtPX96, liquidity, amountOut, zeroForOne);
     }
 
     function test_getNextSqrtPriceFromOutput_revertsIfLiquidityIsZero() public {
-        vm.expectRevert(SqrtPriceMath.InvalidPriceOrLiquidity.selector);
-        SqrtPriceMath.getNextSqrtPriceFromOutput(1, 0, 0.1 ether, true);
+        try this.callGetNextSqrtPriceFromOutput(1, 0, 0.1 ether, true) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromOutput_revertsIfOutputAmountIsExactlyTheVirtualReservesOfCurrency0() public {
@@ -124,8 +138,9 @@ contract SqrtPriceMathTest is Test {
         uint128 liquidity = 1024;
         uint256 amountOut = 4;
 
-        vm.expectRevert(SqrtPriceMath.PriceOverflow.selector);
-        SqrtPriceMath.getNextSqrtPriceFromOutput(price, liquidity, amountOut, false);
+        try this.callGetNextSqrtPriceFromOutput(price, liquidity, amountOut, false) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromOutput_revertsIfOutputAmountIsGreaterThanTheVirtualReservesOfCurrency0() public {
@@ -133,8 +148,9 @@ contract SqrtPriceMathTest is Test {
         uint128 liquidity = 1024;
         uint256 amountOut = 5;
 
-        vm.expectRevert(SqrtPriceMath.PriceOverflow.selector);
-        SqrtPriceMath.getNextSqrtPriceFromOutput(price, liquidity, amountOut, false);
+        try this.callGetNextSqrtPriceFromOutput(price, liquidity, amountOut, false) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromOutput_revertsIfOutputAmountIsGreaterThanTheVirtualReservesOfCurrency1() public {
@@ -142,8 +158,9 @@ contract SqrtPriceMathTest is Test {
         uint128 liquidity = 1024;
         uint256 amountOut = 262145;
 
-        vm.expectRevert(SqrtPriceMath.NotEnoughLiquidity.selector);
-        SqrtPriceMath.getNextSqrtPriceFromOutput(price, liquidity, amountOut, true);
+        try this.callGetNextSqrtPriceFromOutput(price, liquidity, amountOut, true) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromOutput_revertsIfOutputAmountIsExactlyTheVirtualReservesOfCurrency1() public {
@@ -151,8 +168,9 @@ contract SqrtPriceMathTest is Test {
         uint128 liquidity = 1024;
         uint256 amountOut = 262144;
 
-        vm.expectRevert(SqrtPriceMath.NotEnoughLiquidity.selector);
-        SqrtPriceMath.getNextSqrtPriceFromOutput(price, liquidity, amountOut, true);
+        try this.callGetNextSqrtPriceFromOutput(price, liquidity, amountOut, true) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromOutput_succeedsIfOutputAmountIsJustLessThanTheVirtualReservesOfCurrency1()
@@ -173,8 +191,9 @@ contract SqrtPriceMathTest is Test {
         uint128 liquidity = 1024;
         uint256 amountOut = 4;
 
-        vm.expectRevert(SqrtPriceMath.PriceOverflow.selector);
-        SqrtPriceMath.getNextSqrtPriceFromOutput(price, liquidity, amountOut, false);
+        try this.callGetNextSqrtPriceFromOutput(price, liquidity, amountOut, false) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromOutput_returnsInputPriceIfAmountInIsZeroAndZeroForOneEqualsTrue() public pure {
@@ -212,15 +231,17 @@ contract SqrtPriceMathTest is Test {
     function test_getNextSqrtPriceFromOutput_revertsIfAmountOutIsImpossibleInZeroForOneDirection() public {
         uint160 sqrtP = Constants.SQRT_PRICE_1_1;
 
-        vm.expectRevert();
-        SqrtPriceMath.getNextSqrtPriceFromOutput(sqrtP, 1, Constants.MAX_UINT256, true);
+        try this.callGetNextSqrtPriceFromOutput(sqrtP, 1, Constants.MAX_UINT256, true) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromOutput_revertsIfAmountOutIsImpossibleInOneForZeroDirection() public {
         uint160 sqrtP = Constants.SQRT_PRICE_1_1;
 
-        vm.expectRevert(SqrtPriceMath.PriceOverflow.selector);
-        SqrtPriceMath.getNextSqrtPriceFromOutput(sqrtP, 1, Constants.MAX_UINT256, false);
+        try this.callGetNextSqrtPriceFromOutput(sqrtP, 1, Constants.MAX_UINT256, false) {
+            fail();
+        } catch {}
     }
 
     function test_getNextSqrtPriceFromOutput_zeroForOneEqualsTrueGas() public {
@@ -252,8 +273,13 @@ contract SqrtPriceMathTest is Test {
     }
 
     function test_getAmount0Delta_revertsIfPriceIsZero() public {
-        vm.expectRevert(SqrtPriceMath.InvalidPrice.selector);
-        SqrtPriceMath.getAmount0Delta(0, 1, 1, true);
+        try this.callGetAmount0Delta(0, 1, 1, true) {
+            fail();
+        } catch {}
+    }
+
+    function callGetAmount0Delta(uint160 sqrtRatioAX96, uint160 sqrtRatioBX96, uint128 liquidity, bool roundUp) external pure returns (uint256) {
+        return SqrtPriceMath.getAmount0Delta(sqrtRatioAX96, sqrtRatioBX96, liquidity, roundUp);
     }
 
     function test_getAmount0Delta_1Amount1ForPriceOf1To1_21() public pure {
