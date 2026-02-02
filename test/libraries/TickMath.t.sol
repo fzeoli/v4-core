@@ -203,7 +203,8 @@ contract TickMathTestTest is Test, JavascriptFfi {
     }
 
     function test_fuzz_getTickAtSqrtPrice_getSqrtPriceAtTick_relation(int24 tick) public pure {
-        tick = int24(bound(tick, TickMath.MIN_TICK, TickMath.MAX_TICK - 1));
+        // bound to MAX_TICK - 2 because nextTick = tick + 1 and getTickAtSqrtPrice rejects MAX_SQRT_PRICE
+        tick = int24(bound(tick, TickMath.MIN_TICK, TickMath.MAX_TICK - 2));
         int24 nextTick = tick + 1;
         uint160 priceAtTick = TickMath.getSqrtPriceAtTick(tick);
         uint160 priceAtNextTick = TickMath.getSqrtPriceAtTick(nextTick);

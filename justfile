@@ -1,4 +1,3 @@
-
 test *args: (test-forge args)
 build *args: (build-forge args)
 prep *args: fix (test-forge args)
@@ -16,4 +15,3 @@ install-forge:
 
 fix:
     forge fmt
-

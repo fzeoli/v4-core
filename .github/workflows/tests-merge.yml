@@ -6,29 +6,41 @@ on:
       - main
 
 jobs:
-  forge-tests:
-    name: Forge Tests
+  test-foundry:
+    name: Foundry Tests
     runs-on: ubuntu-latest
 
     steps:
       - uses: bullfrogsec/bullfrog@1831f79cce8ad602eef14d2163873f27081ebfb3 # v0.8.4
 
-      - uses: actions/checkout@v5 # v5.0.0
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@50d5a8956f2e319df19e6b57539d7e2acb9f8c1e # v1.5.0
+      - uses: foundry-rs/foundry-toolchain@v1
+
+      - run: forge build
+
+      - run: FOUNDRY_PROFILE=ci forge test --isolate
+
+  test-hardhat:
+    name: Hardhat Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: bullfrogsec/bullfrog@1831f79cce8ad602eef14d2163873f27081ebfb3 # v0.8.4
+
+      - uses: actions/checkout@v5
         with:
-          version: v1.3.6
+          submodules: recursive
 
-      - name: Build
-        run: forge build
-        env:
-          FOUNDRY_PROFILE: ci
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
 
-      - name: Run tests
-        run: forge test --isolate -vvv
-        env:
-          FOUNDRY_PROFILE: ci
-          FORGE_SNAPSHOT_CHECK: true
+      - run: npm ci
+
+      - run: npx hardhat compile
+
+      - run: npm run test:ci

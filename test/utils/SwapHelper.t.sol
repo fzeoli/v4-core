@@ -67,8 +67,14 @@ contract SwapHelperTest is Test, Deployers {
 
     function test_swap_helper_native_zeroForOne_exactOutput() public {
         int256 amountSpecified = 100;
-        vm.expectRevert();
-        swap(nativeKey, true, amountSpecified, ZERO_BYTES);
+        // Use try/catch for HH3 compatibility
+        try this.callSwap(nativeKey, true, amountSpecified, ZERO_BYTES) {
+            fail();
+        } catch {}
+    }
+
+    function callSwap(PoolKey memory _key, bool zeroForOne, int256 amountSpecified, bytes memory hookData) external returns (BalanceDelta) {
+        return swap(_key, zeroForOne, amountSpecified, hookData);
     }
 
     function test_swap_helper_native_oneForZero_exactInput() public {
@@ -110,25 +116,33 @@ contract SwapHelperTest is Test, Deployers {
 
     function test_swapNativeInput_helper_nonnative_zeroForOne_exactInput() public {
         int256 amountSpecified = -100;
-        vm.expectRevert();
-        swapNativeInput(key, true, amountSpecified, ZERO_BYTES, 0 wei);
+        try this.callSwapNativeInput(key, true, amountSpecified, ZERO_BYTES, 0 wei) {
+            fail();
+        } catch {}
+    }
+
+    function callSwapNativeInput(PoolKey memory _key, bool zeroForOne, int256 amountSpecified, bytes memory hookData, uint256 msgValue) external returns (BalanceDelta) {
+        return swapNativeInput(_key, zeroForOne, amountSpecified, hookData, msgValue);
     }
 
     function test_swapNativeInput_helper_nonnative_zeroForOne_exactOutput() public {
         int256 amountSpecified = 100;
-        vm.expectRevert();
-        swapNativeInput(key, true, amountSpecified, ZERO_BYTES, 0 wei);
+        try this.callSwapNativeInput(key, true, amountSpecified, ZERO_BYTES, 0 wei) {
+            fail();
+        } catch {}
     }
 
     function test_swapNativeInput_helper_nonnative_oneForZero_exactInput() public {
         int256 amountSpecified = -100;
-        vm.expectRevert();
-        swapNativeInput(key, false, amountSpecified, ZERO_BYTES, 0 wei);
+        try this.callSwapNativeInput(key, false, amountSpecified, ZERO_BYTES, 0 wei) {
+            fail();
+        } catch {}
     }
 
     function test_swapNativeInput_helper_nonnative_oneForZero_exactOutput() public {
         int256 amountSpecified = 100;
-        vm.expectRevert();
-        swapNativeInput(key, false, amountSpecified, ZERO_BYTES, 0 wei);
+        try this.callSwapNativeInput(key, false, amountSpecified, ZERO_BYTES, 0 wei) {
+            fail();
+        } catch {}
     }
 }

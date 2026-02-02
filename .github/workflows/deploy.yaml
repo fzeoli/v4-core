@@ -17,26 +17,23 @@ jobs:
       - uses: bullfrogsec/bullfrog@1831f79cce8ad602eef14d2163873f27081ebfb3 # v0.8.4
 
       - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: "22"
           registry-url: "https://registry.npmjs.org"
           scope: "@uniswap"
-
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@50d5a8956f2e319df19e6b57539d7e2acb9f8c1e # v1.5.0
-        with:
-          version: v1.3.6
+          cache: "npm"
 
       - name: Install dependencies
-        run: |
-          git submodule update --init --recursive
+        run: npm ci
 
       - name: Compile
-        run: forge build
+        run: npx hardhat compile
 
       - name: Install npm
         run: npm install -g npm@latest

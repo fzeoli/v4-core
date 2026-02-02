@@ -11,23 +11,32 @@ contract FullMathTest is Test {
     uint256 constant MAX_UINT256 = type(uint256).max;
 
     function test_fuzz_mulDiv_revertsWith0Denominator(uint256 x, uint256 y) public {
-        vm.expectRevert();
-        x.mulDiv(y, 0);
+        // Use try/catch for HH3 compatibility
+        try this.callMulDiv(x, y, 0) {
+            fail();
+        } catch {}
+    }
+
+    function callMulDiv(uint256 x, uint256 y, uint256 d) external pure returns (uint256) {
+        return FullMath.mulDiv(x, y, d);
     }
 
     function test_mulDiv_revertsWithOverflowingNumeratorAndZeroDenominator() public {
-        vm.expectRevert();
-        Q128.mulDiv(Q128, 0);
+        try this.callMulDiv(Q128, Q128, 0) {
+            fail();
+        } catch {}
     }
 
     function test_mulDiv_revertsIfOutputOverflows() public {
-        vm.expectRevert();
-        Q128.mulDiv(Q128, 1);
+        try this.callMulDiv(Q128, Q128, 1) {
+            fail();
+        } catch {}
     }
 
     function test_mulDiv_revertsOverflowWithAllMaxInputs() public {
-        vm.expectRevert();
-        MAX_UINT256.mulDiv(MAX_UINT256, MAX_UINT256 - 1);
+        try this.callMulDiv(MAX_UINT256, MAX_UINT256, MAX_UINT256 - 1) {
+            fail();
+        } catch {}
     }
 
     function test_mulDiv_validAllMaxInputs() public pure {
@@ -57,8 +66,13 @@ contract FullMathTest is Test {
     }
 
     function test_fuzz_mulDivRoundingUp_revertsWith0Denominator(uint256 x, uint256 y) public {
-        vm.expectRevert();
-        x.mulDivRoundingUp(y, 0);
+        try this.callMulDivRoundingUp(x, y, 0) {
+            fail();
+        } catch {}
+    }
+
+    function callMulDivRoundingUp(uint256 x, uint256 y, uint256 d) external pure returns (uint256) {
+        return FullMath.mulDivRoundingUp(x, y, d);
     }
 
     function test_mulDivRoundingUp_validWithAllMaxInputs() public pure {
@@ -81,17 +95,19 @@ contract FullMathTest is Test {
     }
 
     function test_mulDivRoundingUp_revertsIfMulDivOverflows256BitsAfterRoundingUp() public {
-        vm.expectRevert();
-        FullMath.mulDivRoundingUp(535006138814359, 432862656469423142931042426214547535783388063929571229938474969, 2);
+        try this.callMulDivRoundingUp(535006138814359, 432862656469423142931042426214547535783388063929571229938474969, 2) {
+            fail();
+        } catch {}
     }
 
     function test_mulDivRoundingUp_revertsIfMulDivOverflows256BitsAfterRoundingUpCase2() public {
-        vm.expectRevert();
-        FullMath.mulDivRoundingUp(
+        try this.callMulDivRoundingUp(
             115792089237316195423570985008687907853269984659341747863450311749907997002549,
             115792089237316195423570985008687907853269984659341747863450311749907997002550,
             115792089237316195423570985008687907853269984653042931687443039491902864365164
-        );
+        ) {
+            fail();
+        } catch {}
     }
 
     function test_fuzz_mulDivRoundingUp(uint256 x, uint256 y, uint256 d) public pure {

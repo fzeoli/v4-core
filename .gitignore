@@ -4,6 +4,7 @@ cache/
 crytic-export/
 node_modules/
 typechain/
+typechain-types/
 foundry-out/
 .vscode/
 out/
